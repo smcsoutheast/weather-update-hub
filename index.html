@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#071a33" />
+  <title>WEATHER UPDATES | Southeast Tournaments</title>
+  <link rel="stylesheet" href="style.css?v=5" />
+</head>
+<body>
+  <div id="stickyStatus" class="sticky-status unavailable">
+    <span id="stickyStatusText">LOADING STATUS</span>
+    <span id="stickyUpdateText">Connecting to published weather status...</span>
+  </div>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <p class="eyebrow">Soccer Management Company</p>
+      <h1>WEATHER UPDATES</h1>
+      <p class="subtitle">Southeast Tournaments</p>
+      <div id="globalStatus" class="global-status unavailable">LOADING STATUS</div>
+      <p id="lastUpdated" class="last-updated">Connecting to published weather status...</p>
+    </div>
+  </header>
+
+  <div id="publicConnectionNotice" class="connection-notice">Connecting to the SMC published status feed...</div>
+
+  <main class="page-shell">
+    <section class="notice-card">
+      <div>
+        <h2>Current Operations Note</h2>
+        <p id="globalNote">Loading the latest published update...</p>
+      </div>
+      <div class="notice-actions">
+        <button id="refreshBtn" class="secondary small-btn" type="button">Refresh</button>
+      </div>
+    </section>
+
+    <button id="publicLightningBadge" class="lightning-status-badge" type="button" aria-expanded="false" aria-controls="publicLightningPanel">
+      <span class="lightning-bolt">⚡</span>
+      <span>Lightning All Clear</span>
+    </button>
+
+    <section id="publicLightningPanel" class="panel lightning-public-panel hidden" aria-live="polite">
+      <div class="panel-header">
+        <div>
+          <h2>Lightning Status</h2>
+          <p class="muted">Closest strike distance and active return-to-play countdown</p>
+        </div>
+      </div>
+      <div id="publicLightningList" class="public-lightning-list"></div>
+    </section>
+
+    <section id="venueGrid" class="venue-grid" aria-live="polite"></section>
+
+    <section id="fieldStatusPanel" class="panel field-status-panel hidden">
+      <div class="panel-header">
+        <div>
+          <h2>Field Status Board</h2>
+          <p class="muted">Field-level updates for current public venues</p>
+        </div>
+      </div>
+      <div id="fieldStatusBoard" class="field-status-board"></div>
+    </section>
+
+    <section class="info-grid">
+      <article class="panel">
+        <h2>Status Key</h2>
+        <div class="status-key">
+          <div><span class="dot green-dot"></span><strong>Green</strong><p>Normal operations. No weather threats detected.</p></div>
+          <div><span class="dot yellow-dot"></span><strong>Yellow</strong><p>Potential delays, field changes, or active monitoring.</p></div>
+          <div><span class="dot red-dot"></span><strong>Red</strong><p>Facility closed. Games delayed, suspended, or cancelled.</p></div>
+        </div>
+      </article>
+
+      <article class="panel">
+        <h2>Fast Actions for Teams</h2>
+        <div class="status-key">
+          <div><span class="dot green-dot"></span><strong>Green</strong><p>Report to fields as scheduled.</p></div>
+          <div><span class="dot yellow-dot"></span><strong>Yellow</strong><p>Stay close to your field and check updates often.</p></div>
+          <div><span class="dot red-dot"></span><strong>Red</strong><p>Clear the fields and wait for SMC staff instructions.</p></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="panel history-panel">
+      <div class="panel-header">
+        <div>
+          <h2>Status History</h2>
+          <p class="muted">Last 72 hours</p>
+        </div>
+      </div>
+      <div id="historyList" class="history-list"></div>
+    </section>
+
+    <section class="panel weather-apps-panel">
+      <div class="panel-header">
+        <div>
+          <h2>SMC Southeast uses the following weather apps when monitoring weather conditions in addition to weather alerts from the National Weather Service</h2>
+        </div>
+      </div>
+      <div class="weather-app-grid">
+        <article class="weather-app-card">
+          <img src="assets/my-lightning-tracker.webp" alt="My Lightning Tracker & Alerts app logo" />
+          <div>
+            <h3>My Lightning Tracker & Alerts</h3>
+            <div class="app-links">
+              <a href="https://apps.apple.com/us/app/my-lightning-tracker-alerts/id1175031987" target="_blank" rel="noopener">App Store</a>
+              <a href="https://play.google.com/store/apps/details?id=com.jrustonapps.mylightningtracker&hl=en-US" target="_blank" rel="noopener">Google Play</a>
+            </div>
+          </div>
+        </article>
+        <article class="weather-app-card">
+          <img src="assets/myradar.webp" alt="MyRadar app logo" />
+          <div>
+            <h3>MyRadar</h3>
+            <div class="app-links">
+              <a href="https://apps.apple.com/us/app/myradar-accurate-weather-radar/id322439990" target="_blank" rel="noopener">App Store</a>
+              <a href="https://play.google.com/store/apps/details?id=com.acmeaom.android.myradar&hl=en-US" target="_blank" rel="noopener">Google Play</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <button id="adminShieldBtn" class="admin-shield" type="button" aria-label="Open admin access" title="Admin Access">🛡</button>
+
+  <aside id="adminDrawer" class="admin-drawer hidden" aria-label="Admin command center">
+    <section class="admin-panel">
+      <div class="drawer-header">
+        <div>
+          <h2>Admin Access</h2>
+          <p id="adminSessionText" class="muted">Protected command center</p>
+        </div>
+        <button id="minimizeAdminBtn" class="icon-btn" type="button" aria-label="Minimize admin panel">×</button>
+      </div>
+
+      <div id="loginBox" class="login-box">
+        <input id="passwordInput" type="password" placeholder="Enter command center password" autocomplete="current-password" />
+        <button id="verifyBtn" type="button">Verify</button>
+      </div>
+
+      <div id="commandCenter" class="command-center hidden">
+        <div id="commandReadOnlyBanner" class="command-readonly-banner hidden">READ ONLY. Another device owns the Command Center.</div>
+
+        <div class="command-header">
+          <div>
+            <h2>Command Center</h2>
+            <p class="muted">Use tabs to manage public updates, lightning, fields, venues, and logs.</p>
+          </div>
+          <div class="command-tools">
+            <button id="fullScreenBtn" class="secondary" type="button">Exit Full Screen</button>
+            <button id="lockBtn" class="secondary" type="button">Lock</button>
+          </div>
+        </div>
+
+        <nav class="admin-tabs" aria-label="Command center tabs">
+          <button class="tab-btn active" data-tab="overview" type="button">Overview</button>
+          <button class="tab-btn" data-tab="lightning" type="button">Lightning</button>
+          <button class="tab-btn" data-tab="fields" type="button">Fields</button>
+          <button class="tab-btn" data-tab="venues" type="button">Venues</button>
+          <button class="tab-btn" data-tab="logs" type="button">Logs</button>
+        </nav>
+
+        <section class="tab-panel active" data-tab-panel="overview">
+          <section class="controls command-controls">
+            <div>
+              <label for="stateFilter">Command Center region filter</label>
+              <select id="stateFilter">
+                <option value="all">All Active Venues</option>
+                <option value="Florida">Florida</option>
+                <option value="North Carolina">North Carolina</option>
+                <option value="South Carolina">South Carolina</option>
+                <option value="Alabama">Alabama</option>
+                <option value="Georgia">Georgia</option>
+              </select>
+              <p class="field-help">Every venue in the Hub is treated as active and appears publicly. Add only the venues in use for the current weekend.</p>
+            </div>
+          </section>
+
+
+
+          <section class="admin-form firebase-status-card">
+            <div class="panel-header compact-header">
+              <div>
+                <h3>Command Device & Firebase</h3>
+                <p id="firebaseStatusText" class="field-help">Checking Firebase connection...</p>
+              </div>
+              <span id="firebaseStatusBadge" class="sync-badge local">Connecting</span>
+            </div>
+            <p id="commandDeviceStatusText" class="command-device-status">This browser is not the active command device.</p>
+            <p class="field-help">Only the active command device publishes operational changes. Public viewers and backup devices are read only.</p>
+            <div class="admin-actions">
+              <button id="takeoverCommandBtn" class="danger hidden" type="button">Take Over Command Center</button>
+              <button id="releaseCommandBtn" class="secondary hidden" type="button">Release Command Device</button>
+            </div>
+          </section>
+
+          <section class="admin-form active-venue-note">
+            <h3>Active Weekend Venue Roster</h3>
+            <p class="field-help">The public Hub shows every venue listed in the Venues tab. There are no tournament assignments or tournament visibility filters.</p>
+          </section>
+
+          <div class="admin-actions emergency-actions">
+            <button id="allGreenBtn" type="button">All Green</button>
+            <button id="allYellowBtn" type="button">All Yellow</button>
+            <button id="allRedBtn" class="danger" type="button">Emergency Red</button>
+            <button id="seedBtn" class="secondary" type="button">Clear Weekend Hub</button>
+          </div>
+
+          <form id="globalForm" class="admin-form">
+            <h3>Global Update</h3>
+            <p class="field-help">Overall status updates automatically from venue status. Red overrides Yellow. Yellow overrides Green.</p>
+            <label for="globalTemplateSelect">Status template</label>
+            <select id="globalTemplateSelect">
+              <option value="">Select a template</option>
+              <option value="allClear">All clear</option>
+              <option value="monitoring">Weather monitoring</option>
+              <option value="lightningDelay">Lightning delay</option>
+              <option value="heatAdvisory">Heat advisory</option>
+              <option value="fieldClosure">Field closure</option>
+              <option value="resumePlay">Resume play</option>
+            </select>
+
+            <label for="globalNoteInput">Public note</label>
+            <textarea id="globalNoteInput" rows="4"></textarea>
+            <button type="submit">Save Global Note</button>
+          </form>
+        </section>
+
+        <section class="tab-panel" data-tab-panel="lightning">
+          <form id="lightningForm" class="admin-form">
+            <h3>Automated Lightning Alerts</h3>
+            <p class="field-help">Enter the latest strike distance. Red begins at 10 miles or less. A new qualifying strike resets the single venue timer. When the timer reaches zero, the venue stays Red until SMC staff press Manual All Clear.</p>
+            <label for="lightningVenueSelect">Venue</label>
+            <select id="lightningVenueSelect"></select>
+            <label for="lightningDistanceInput">Closest lightning strike distance in miles</label>
+            <input id="lightningDistanceInput" type="number" min="0" step="0.1" placeholder="Example: 8.5" />
+            <label for="lightningMinutesInput">Minutes since last detected strike</label>
+            <input id="lightningMinutesInput" type="number" min="0" step="1" placeholder="Example: 12" />
+            <label for="lightningSourceSelect">Alert source</label>
+            <select id="lightningSourceSelect">
+              <option value="Radar or lightning app">Radar or lightning app</option>
+              <option value="Venue staff report">Venue staff report</option>
+              <option value="Weather service alert">Weather service alert</option>
+              <option value="Tournament director decision">Tournament director decision</option>
+            </select>
+            <label for="lightningNotesInput">Private lightning note</label>
+            <textarea id="lightningNotesInput" rows="3" placeholder="Add source details or staff instructions."></textarea>
+            <button type="submit">Apply Lightning Check</button>
+          </form>
+
+          <section class="admin-form">
+            <div class="panel-header compact-header">
+              <div>
+                <h3>Active Lightning Alerts</h3>
+                <p class="field-help">Countdowns and alert records for staff.</p>
+              </div>
+            </div>
+            <div id="lightningAlertList" class="incident-list"></div>
+          </section>
+
+          <form id="aiUpdateForm" class="admin-form">
+            <h3>AI-Generated Weather Update</h3>
+            <p class="field-help">Build a public update from a weather alert. Review the draft before applying it.</p>
+            <label for="aiVenueSelect">Venue</label>
+            <select id="aiVenueSelect"></select>
+            <label for="aiAlertTypeSelect">Weather alert type</label>
+            <select id="aiAlertTypeSelect">
+              <option value="Lightning">Lightning</option>
+              <option value="Severe Weather">Severe Weather</option>
+              <option value="Heavy Rain">Heavy Rain</option>
+              <option value="Heat Advisory">Heat Advisory</option>
+              <option value="Field Conditions">Field Conditions</option>
+              <option value="Resume Play">Resume Play</option>
+            </select>
+            <label for="aiSeveritySelect">Action level</label>
+            <select id="aiSeveritySelect">
+              <option value="Monitoring">Monitoring</option>
+              <option value="Delay">Delay</option>
+              <option value="Suspended">Suspended</option>
+              <option value="All Clear">All Clear</option>
+            </select>
+            <label for="aiWeatherDetailsInput">Weather alert details</label>
+            <textarea id="aiWeatherDetailsInput" rows="4" placeholder="Example: Lightning detected within 8 miles. Teams should clear fields now."></textarea>
+            <button type="submit">Generate Update Draft</button>
+            <label for="aiGeneratedOutput">Generated public update</label>
+            <textarea id="aiGeneratedOutput" rows="5" placeholder="Generated update will appear here."></textarea>
+            <div class="admin-actions">
+              <button id="aiApplyVenueBtn" type="button">Apply to Venue</button>
+              <button id="aiApplyGlobalBtn" class="secondary" type="button">Apply as Global Note</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="tab-panel" data-tab-panel="fields">
+          <form id="fieldStatusForm" class="admin-form">
+            <h3>Dynamic Field Status Board</h3>
+            <label for="fieldVenueSelect">Venue</label>
+            <select id="fieldVenueSelect"></select>
+            <label for="fieldNameInput">Field name or number</label>
+            <input id="fieldNameInput" type="text" placeholder="Example: Field 1" />
+            <label for="fieldStatusSelect">Field status</label>
+            <select id="fieldStatusSelect">
+              <option value="Open">Open</option>
+              <option value="Delayed">Delayed</option>
+              <option value="Closed">Closed</option>
+              <option value="Under Review">Under Review</option>
+              <option value="Maintenance">Maintenance</option>
+            </select>
+            <label for="fieldNoteInput">Public field note</label>
+            <textarea id="fieldNoteInput" rows="3" placeholder="Example: Field 3 is under review due to standing water."></textarea>
+            <button type="submit">Save Field Status</button>
+          </form>
+
+          <section class="admin-form">
+            <div class="panel-header compact-header">
+              <div>
+                <h3>Field Status Records</h3>
+                <p class="field-help">These records show publicly in the Field Status Board.</p>
+              </div>
+              <button id="clearFieldBoardBtn" class="secondary small-btn" type="button">Clear Field Board</button>
+            </div>
+            <div id="fieldBoardAdminList" class="incident-list"></div>
+          </section>
+        </section>
+
+        <section class="tab-panel" data-tab-panel="venues">
+          <form id="venueForm" class="admin-form">
+            <h3>Add Active Weekend Venue</h3>
+            <label for="newVenueName">Venue name</label>
+            <input id="newVenueName" type="text" placeholder="Example: Premier Sports Campus" />
+            <label for="newVenueState">Region</label>
+            <select id="newVenueState">
+              <option value="Florida">Florida</option>
+              <option value="North Carolina">North Carolina</option>
+              <option value="South Carolina">South Carolina</option>
+              <option value="Alabama">Alabama</option>
+              <option value="Georgia">Georgia</option>
+            </select>
+            <p class="field-help">Add only venues being used for the current weekend. Every venue added here appears on the public Hub.</p>
+            <label for="newVenueAddress">Venue address or details</label>
+            <input id="newVenueAddress" type="text" placeholder="Street address, city, state" />
+            <label for="newVenueMap">GPS or map link</label>
+            <input id="newVenueMap" type="url" placeholder="https://maps.google.com/..." />
+            <label for="newVenueMedical">Medical location or note</label>
+            <input id="newVenueMedical" type="text" placeholder="Optional staff-only venue detail" />
+            <label for="newVenueShelter">Weather shelter location or note</label>
+            <input id="newVenueShelter" type="text" placeholder="Optional staff-only venue detail" />
+            <label for="newVenueParking">Parking or access note</label>
+            <input id="newVenueParking" type="text" placeholder="Optional staff-only venue detail" />
+            <button type="submit">Add Active Venue</button>
+          </form>
+
+          <div id="adminVenueList" class="admin-venue-list"></div>
+        </section>
+
+        <section class="tab-panel" data-tab-panel="logs">
+          <form id="timelineForm" class="admin-form">
+            <h3>Add Timeline Update</h3>
+            <label for="timelineTitleInput">Title</label>
+            <input id="timelineTitleInput" type="text" placeholder="Example: Lightning delay issued" />
+            <label for="timelineBodyInput">Private operations timeline note</label>
+            <textarea id="timelineBodyInput" rows="3" placeholder="Enter a short operations update for staff."></textarea>
+            <button type="submit">Add Timeline Entry</button>
+          </form>
+
+          <section class="admin-form timeline-panel">
+            <div class="panel-header compact-header">
+              <div>
+                <h3>Operations Timeline</h3>
+                <p class="field-help">Private command center timeline for staff.</p>
+              </div>
+              <button id="clearHistoryBtn" class="secondary small-btn" type="button">Clear Public Status History</button>
+            </div>
+            <div id="timelineList" class="history-list"></div>
+          </section>
+
+          <form id="incidentForm" class="admin-form">
+            <h3>Incident Log</h3>
+            <label for="incidentVenueSelect">Venue</label>
+            <select id="incidentVenueSelect"></select>
+            <label for="incidentTypeSelect">Incident type</label>
+            <select id="incidentTypeSelect">
+              <option value="Weather">Weather</option>
+              <option value="Lightning">Lightning</option>
+              <option value="Field Condition">Field Condition</option>
+              <option value="Medical">Medical</option>
+              <option value="Parking">Parking</option>
+              <option value="Security">Security</option>
+              <option value="Other">Other</option>
+            </select>
+            <label for="incidentNoteInput">Private incident note</label>
+            <textarea id="incidentNoteInput" rows="4" placeholder="Document what happened, who was notified, and next steps."></textarea>
+            <label for="incidentFileInput">Upload file or photo</label>
+            <input id="incidentFileInput" type="file" multiple accept="image/*,.pdf,.txt,.doc,.docx" />
+            <p class="field-help">Incident attachments are stored in the private Firebase admin branch. Keep files small to avoid large database writes.</p>
+            <button type="submit">Save Incident</button>
+          </form>
+
+          <section class="admin-form">
+            <div class="panel-header compact-header">
+              <div>
+                <h3>Incident Records</h3>
+                <p class="field-help">Private operations log for staff.</p>
+              </div>
+              <button id="clearIncidentsBtn" class="secondary small-btn" type="button">Clear Incidents</button>
+            </div>
+            <div id="incidentList" class="incident-list"></div>
+          </section>
+        </section>
+      </div>
+    </section>
+  </aside>
+
+  <footer class="footer">
+    <img class="footer-logo" src="assets/smc-logo.png" alt="Soccer Management Company logo" />
+    <p>Soccer Management Company - Southeast Weather Hub</p>
+  </footer>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+  <script src="firebase-config.js?v=5"></script>
+  <script src="script.js?v=5"></script>
+</body>
+</html>

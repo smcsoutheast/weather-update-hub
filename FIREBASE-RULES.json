@@ -1,0 +1,20 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "southeast-weather-hub-v2": {
+      "public": {
+        ".read": true,
+        ".write": true
+      },
+      "admin": {
+        ".read": true,
+        ".write": true
+      },
+      "system": {
+        ".read": true,
+        ".write": true
+      }
+    }
+  }
+}
