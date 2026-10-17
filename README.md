@@ -177,3 +177,12 @@ Asset files must remain in:
 - `assets/my-lightning-tracker.webp`
 - `assets/myradar.webp`
 
+
+
+## Manual All Clear reliability update
+
+- Manual All Clear remains visible whenever a venue has an uncleared lightning condition.
+- Editing venue details no longer removes lightning control from an active venue.
+- Global status changes no longer hide Manual All Clear for an active lightning venue.
+- Weather Update Builder messages preserve lightning control while the lightning condition remains uncleared.
+- Manual All Clear restores the venue state recorded before the lightning delay.

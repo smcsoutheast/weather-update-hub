@@ -207,11 +207,19 @@ function fieldColor(status) {
   return "green";
 }
 
-function isLightningRelevant(venue) {
-  const lightning = venue.lightning;
+function hasUnclearedLightning(venue) {
+  const lightning = venue && venue.lightning;
   if (!lightning) return false;
-  if (lightning.active || lightning.monitoring || lightning.awaitingAllClear) return true;
-  return venue.statusSource === "lightning" && venue.status !== "green";
+  return Boolean(
+    lightning.active ||
+    lightning.monitoring ||
+    lightning.awaitingAllClear ||
+    venue.statusSource === "lightning"
+  );
+}
+
+function isLightningRelevant(venue) {
+  return hasUnclearedLightning(venue);
 }
 
 function hasActiveWeather() {
@@ -714,7 +722,7 @@ function renderAdminLightning() {
         <strong>${escapeHtml(venue.name)} | ${escapeHtml(venue.status.toUpperCase())}</strong>
         <span>${Number.isFinite(Number(lightning.distance)) ? `${Number(lightning.distance).toFixed(1)} miles` : "Distance not listed"} | ${escapeHtml(timerText)}</span>
         <p>${escapeHtml(lightning.publicNote || venue.note || "")}</p>
-        ${venue.statusSource === "lightning" ? `<button class="manual-clear-btn" data-action="manual-all-clear" data-venue-id="${escapeAttr(venue.id)}" type="button">Manual All Clear</button>` : ""}
+        ${hasUnclearedLightning(venue) ? `<button class="manual-clear-btn" data-action="manual-all-clear" data-venue-id="${escapeAttr(venue.id)}" type="button">Manual All Clear</button>` : ""}
       </article>`;
   }).join("") : `<p class="muted">No lightning records for active venues.</p>`;
 }
@@ -836,11 +844,17 @@ async function applyAllStatus(status) {
   const updates = {};
   const note = statusTemplateFor(status);
   venues.forEach(venue => {
-    updates[`public/venues/${venue.id}/status`] = status;
-    updates[`public/venues/${venue.id}/statusSource`] = "manual";
-    updates[`public/venues/${venue.id}/note`] = note;
+    const lightningLocked = hasUnclearedLightning(venue);
+    const publishedStatus = lightningLocked ? "red" : status;
+    const publishedSource = lightningLocked ? "lightning" : "manual";
+    const publishedNote = lightningLocked
+      ? (venue.lightning?.publicNote || venue.note || templates.lightningDelay)
+      : note;
+    updates[`public/venues/${venue.id}/status`] = publishedStatus;
+    updates[`public/venues/${venue.id}/statusSource`] = publishedSource;
+    updates[`public/venues/${venue.id}/note`] = publishedNote;
     updates[`public/venues/${venue.id}/updatedAt`] = firebase.database.ServerValue.TIMESTAMP;
-    historyUpdate(updates, `${venue.name} ${titleCaseStatus(status)}`, note, status);
+    historyUpdate(updates, `${venue.name} ${titleCaseStatus(publishedStatus)}`, publishedNote, publishedStatus);
   });
   timelineUpdate(updates, `All active venues set ${titleCaseStatus(status)}`, note);
   await publishUpdates(updates, `All active venues published as ${titleCaseStatus(status)}.`);
@@ -892,13 +906,16 @@ async function saveVenueFromCard(card) {
     alert("This venue has a lightning status. Use Manual All Clear before lowering the venue status.");
     return;
   }
+  const lightningLocked = hasUnclearedLightning(current);
   const next = {
     ...current,
     name: value("name") || current.name,
     state: card.querySelector('[data-field="state"]').value,
-    status: nextStatus,
-    statusSource: "manual",
-    note: value("note") || statusTemplateFor(nextStatus),
+    status: lightningLocked ? current.status : nextStatus,
+    statusSource: lightningLocked ? "lightning" : "manual",
+    note: lightningLocked
+      ? (current.lightning?.publicNote || current.note)
+      : (value("note") || statusTemplateFor(nextStatus)),
     address: value("address"),
     map: value("map"),
     medical: value("medical"),
@@ -1087,7 +1104,7 @@ async function manualAllClear(venueId) {
     [`public/venues/${venueId}/lightning`]: lightning,
     [`public/venues/${venueId}/updatedAt`]: firebase.database.ServerValue.TIMESTAMP
   };
-  if (venue.statusSource === "lightning") {
+  if (hasUnclearedLightning(venue)) {
     updates[`public/venues/${venueId}/status`] = restoreStatus;
     updates[`public/venues/${venueId}/statusSource`] = restoreStatus === "green" ? "lightning-clear" : restoreSource;
     updates[`public/venues/${venueId}/note`] = finalNote;
@@ -1159,17 +1176,19 @@ async function applyAiToVenue() {
   if (!note) return alert("Generate or enter an update first.");
   const severity = elements.aiSeveritySelect.value;
   const status = severity === "Monitoring" ? "yellow" : severity === "All Clear" ? "green" : "red";
-  if (status !== "red" && venue.lightning && (venue.lightning.active || venue.lightning.monitoring || venue.statusSource === "lightning")) {
+  if (status !== "red" && hasUnclearedLightning(venue)) {
     alert("This venue has an active lightning status. Use Manual All Clear instead of publishing a Weather Update Builder all clear.");
     return;
   }
+  const lightningLocked = hasUnclearedLightning(venue);
+  const publishedStatus = lightningLocked ? "red" : status;
   const updates = {
-    [`public/venues/${venue.id}/status`]: status,
-    [`public/venues/${venue.id}/statusSource`]: "manual",
+    [`public/venues/${venue.id}/status`]: publishedStatus,
+    [`public/venues/${venue.id}/statusSource`]: lightningLocked ? "lightning" : "manual",
     [`public/venues/${venue.id}/note`]: note,
     [`public/venues/${venue.id}/updatedAt`]: firebase.database.ServerValue.TIMESTAMP
   };
-  historyUpdate(updates, `${venue.name} ${titleCaseStatus(status)}`, note, status);
+  historyUpdate(updates, `${venue.name} ${titleCaseStatus(publishedStatus)}`, note, publishedStatus);
   timelineUpdate(updates, `${venue.name} weather update published`, note);
   await publishUpdates(updates, `${venue.name} update published.`);
 }
