@@ -163,3 +163,17 @@ When a lightning timer reaches 00:00, verify field and weather conditions, then 
 - `assets/smc-logo.png`
 - `assets/my-lightning-tracker.webp`
 - `assets/myradar.webp`
+
+
+## Public View Reliability Update
+
+This build hides normal Firebase connection messages from public visitors. A connection notice appears only when the Hub cannot refresh current data.
+
+Image assets use relative GitHub Pages paths and include browser-side fallbacks. If an app logo or SMC logo fails to load, the page displays a text fallback instead of a broken-image icon.
+
+Asset files must remain in:
+
+- `assets/smc-logo.png`
+- `assets/my-lightning-tracker.webp`
+- `assets/myradar.webp`
+

@@ -24,3 +24,14 @@
 22. Select Manual All Clear for one venue and confirm only that venue changes to Green.
 23. Open Admin Access on another device and confirm it opens read only.
 24. Test Take Over Command Center only after the first device is ready to lose write control.
+
+
+## Public image check
+
+After deployment, open these paths directly in a browser:
+
+- `/assets/smc-logo.png?v=6`
+- `/assets/my-lightning-tracker.webp?v=6`
+- `/assets/myradar.webp?v=6`
+
+If any path returns 404, confirm the `assets` folder is on the same GitHub Pages branch and in the repository root.

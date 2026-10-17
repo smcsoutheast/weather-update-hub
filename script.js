@@ -364,6 +364,11 @@ function renderHistory() {
 
 function setPublicConnectionState(type, text) {
   if (!elements.publicConnectionNotice) return;
+  if (type === "connected") {
+    elements.publicConnectionNotice.textContent = "";
+    elements.publicConnectionNotice.className = "connection-notice hidden";
+    return;
+  }
   elements.publicConnectionNotice.textContent = text;
   elements.publicConnectionNotice.className = `connection-notice ${type}`;
 }
@@ -393,12 +398,12 @@ async function refreshPublicData(options = {}) {
       publicData = normalizePublicData(raw);
       publicDataLoaded = true;
       renderPublic();
-      setPublicConnectionState("connected", "Live status feed connected. Public viewers are read only.");
+      setPublicConnectionState("connected", "");
     } else {
       publicData = blankPublicData();
       publicDataLoaded = true;
       renderPublic();
-      setPublicConnectionState("connected", "Hub connected. No active weekend venue roster has been published yet.");
+      setPublicConnectionState("connected", "");
     }
   } catch (error) {
     if (publicDataLoaded) {
@@ -1335,6 +1340,28 @@ function bindEvents() {
   elements.clearIncidentsBtn.addEventListener("click", clearIncidents);
 }
 
+function installImageFallbacks() {
+  document.querySelectorAll("img[data-fallback]").forEach(img => {
+    const showFallback = () => {
+      if (img.dataset.fallbackShown === "true") return;
+      img.dataset.fallbackShown = "true";
+      img.classList.add("image-load-failed");
+      const fallback = document.createElement("span");
+      fallback.className = img.classList.contains("footer-logo") ? "image-fallback footer-image-fallback" : "image-fallback";
+      fallback.textContent = img.dataset.fallback || img.alt || "Image";
+      fallback.setAttribute("role", "img");
+      fallback.setAttribute("aria-label", img.alt || fallback.textContent);
+      img.insertAdjacentElement("afterend", fallback);
+    };
+
+    img.addEventListener("error", showFallback, { once: true });
+
+    if (img.complete && img.naturalWidth === 0) {
+      showFallback();
+    }
+  });
+}
+
 function addStyleSupport() {
   // Styling is kept in style.css. This function exists only as an initialization marker.
 }
@@ -1349,6 +1376,7 @@ function startLightningUiClock() {
 
 function initialize() {
   addStyleSupport();
+  installImageFallbacks();
   bindEvents();
   initFirebase();
   renderPublic();

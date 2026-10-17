@@ -724,3 +724,35 @@ body.command-mode .venue-grid {
   letter-spacing: 0.04em;
 }
 .active-venue-note { border-left: 6px solid var(--blue); }
+
+
+.image-load-failed {
+  display: none !important;
+}
+
+.image-fallback {
+  width: 72px;
+  height: 72px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  padding: 8px;
+  border-radius: 18px;
+  background: #e2e8f0;
+  color: #0f172a;
+  font-size: 0.78rem;
+  font-weight: 900;
+  line-height: 1.1;
+  text-align: center;
+  border: 1px solid #cbd5e1;
+}
+
+.footer-image-fallback {
+  width: min(220px, 68vw);
+  height: 74px;
+  margin: 0 auto 16px;
+  border-radius: 14px;
+  font-size: 1.25rem;
+  letter-spacing: 0.08em;
+}

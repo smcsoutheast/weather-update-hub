@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#071a33" />
   <title>WEATHER UPDATES | Southeast Tournaments</title>
-  <link rel="stylesheet" href="style.css?v=5" />
+  <link rel="stylesheet" href="style.css?v=6" />
 </head>
 <body>
   <div id="stickyStatus" class="sticky-status unavailable">
@@ -23,7 +23,7 @@
     </div>
   </header>
 
-  <div id="publicConnectionNotice" class="connection-notice">Connecting to the SMC published status feed...</div>
+  <div id="publicConnectionNotice" class="connection-notice hidden" role="status" aria-live="polite"></div>
 
   <main class="page-shell">
     <section class="notice-card">
@@ -101,7 +101,7 @@
       </div>
       <div class="weather-app-grid">
         <article class="weather-app-card">
-          <img src="assets/my-lightning-tracker.webp" alt="My Lightning Tracker & Alerts app logo" />
+          <img src="assets/my-lightning-tracker.webp?v=6" alt="My Lightning Tracker & Alerts app logo" data-fallback="My Lightning Tracker" />
           <div>
             <h3>My Lightning Tracker & Alerts</h3>
             <div class="app-links">
@@ -111,7 +111,7 @@
           </div>
         </article>
         <article class="weather-app-card">
-          <img src="assets/myradar.webp" alt="MyRadar app logo" />
+          <img src="assets/myradar.webp?v=6" alt="MyRadar app logo" data-fallback="MyRadar" />
           <div>
             <h3>MyRadar</h3>
             <div class="app-links">
@@ -415,13 +415,13 @@
   </aside>
 
   <footer class="footer">
-    <img class="footer-logo" src="assets/smc-logo.png" alt="Soccer Management Company logo" />
+    <img class="footer-logo" src="assets/smc-logo.png?v=6" alt="Soccer Management Company logo" data-fallback="SMC" />
     <p>Soccer Management Company - Southeast Weather Hub</p>
   </footer>
 
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
-  <script src="firebase-config.js?v=5"></script>
-  <script src="script.js?v=5"></script>
+  <script src="firebase-config.js?v=6"></script>
+  <script src="script.js?v=6"></script>
 </body>
 </html>
