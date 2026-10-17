@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#071a33" />
   <title>WEATHER UPDATES | Southeast Tournaments</title>
-  <link rel="stylesheet" href="style.css?v=6" />
+  <link rel="stylesheet" href="style.css?v=7" />
 </head>
 <body>
   <div id="stickyStatus" class="sticky-status unavailable">
@@ -45,7 +45,7 @@
       <div class="panel-header">
         <div>
           <h2>Lightning Status</h2>
-          <p class="muted">Closest strike distance and active return-to-play countdown</p>
+          <p class="muted">Closest strike distance and current lightning clearance period</p>
         </div>
       </div>
       <div id="publicLightningList" class="public-lightning-list"></div>
@@ -67,9 +67,9 @@
       <article class="panel">
         <h2>Status Key</h2>
         <div class="status-key">
-          <div><span class="dot green-dot"></span><strong>Green</strong><p>Normal operations. No weather threats detected.</p></div>
-          <div><span class="dot yellow-dot"></span><strong>Yellow</strong><p>Potential delays, field changes, or active monitoring.</p></div>
-          <div><span class="dot red-dot"></span><strong>Red</strong><p>Facility closed. Games delayed, suspended, or cancelled.</p></div>
+          <div><span class="dot green-dot"></span><strong>Green</strong><p>All Clear. Operations are proceeding as scheduled.</p></div>
+          <div><span class="dot yellow-dot"></span><strong>Yellow</strong><p>Conditions are being monitored. Delays or field changes are possible.</p></div>
+          <div><span class="dot red-dot"></span><strong>Red</strong><p>Play is suspended or the venue is closed. Follow the posted instructions.</p></div>
         </div>
       </article>
 
@@ -77,8 +77,8 @@
         <h2>Fast Actions for Teams</h2>
         <div class="status-key">
           <div><span class="dot green-dot"></span><strong>Green</strong><p>Report to fields as scheduled.</p></div>
-          <div><span class="dot yellow-dot"></span><strong>Yellow</strong><p>Stay close to your field and check updates often.</p></div>
-          <div><span class="dot red-dot"></span><strong>Red</strong><p>Clear the fields and wait for SMC staff instructions.</p></div>
+          <div><span class="dot yellow-dot"></span><strong>Yellow</strong><p>Remain near your assigned venue and monitor the Weather Hub for updates.</p></div>
+          <div><span class="dot red-dot"></span><strong>Red</strong><p>Leave the fields and follow instructions from SMC staff and venue personnel.</p></div>
         </div>
       </article>
     </section>
@@ -101,7 +101,7 @@
       </div>
       <div class="weather-app-grid">
         <article class="weather-app-card">
-          <img src="assets/my-lightning-tracker.webp?v=6" alt="My Lightning Tracker & Alerts app logo" data-fallback="My Lightning Tracker" />
+          <img src="assets/my-lightning-tracker.webp?v=7" alt="My Lightning Tracker & Alerts app logo" data-fallback="My Lightning Tracker" />
           <div>
             <h3>My Lightning Tracker & Alerts</h3>
             <div class="app-links">
@@ -111,7 +111,7 @@
           </div>
         </article>
         <article class="weather-app-card">
-          <img src="assets/myradar.webp?v=6" alt="MyRadar app logo" data-fallback="MyRadar" />
+          <img src="assets/myradar.webp?v=7" alt="MyRadar app logo" data-fallback="MyRadar" />
           <div>
             <h3>MyRadar</h3>
             <div class="app-links">
@@ -232,7 +232,7 @@
         <section class="tab-panel" data-tab-panel="lightning">
           <form id="lightningForm" class="admin-form">
             <h3>Automated Lightning Alerts</h3>
-            <p class="field-help">Enter the latest strike distance. Red begins at 10 miles or less. A new qualifying strike resets the single venue timer. When the timer reaches zero, the venue stays Red until SMC staff press Manual All Clear.</p>
+            <p class="field-help">Enter the latest strike distance. Red begins at 10 miles or less. A new qualifying strike resets the venue lightning clearance period. When the clearance period reaches zero, the venue remains Red until SMC staff issue Manual All Clear.</p>
             <label for="lightningVenueSelect">Venue</label>
             <select id="lightningVenueSelect"></select>
             <label for="lightningDistanceInput">Closest lightning strike distance in miles</label>
@@ -262,8 +262,8 @@
           </section>
 
           <form id="aiUpdateForm" class="admin-form">
-            <h3>AI-Generated Weather Update</h3>
-            <p class="field-help">Build a public update from a weather alert. Review the draft before applying it.</p>
+            <h3>Weather Update Builder</h3>
+            <p class="field-help">Prepare a professional public update from the selected weather condition. Review the draft before publishing it.</p>
             <label for="aiVenueSelect">Venue</label>
             <select id="aiVenueSelect"></select>
             <label for="aiAlertTypeSelect">Weather alert type</label>
@@ -278,15 +278,15 @@
             <label for="aiSeveritySelect">Action level</label>
             <select id="aiSeveritySelect">
               <option value="Monitoring">Monitoring</option>
-              <option value="Delay">Delay</option>
-              <option value="Suspended">Suspended</option>
+              <option value="Temporary Delay">Temporary Delay</option>
+              <option value="Play Suspended">Play Suspended</option>
               <option value="All Clear">All Clear</option>
             </select>
             <label for="aiWeatherDetailsInput">Weather alert details</label>
             <textarea id="aiWeatherDetailsInput" rows="4" placeholder="Example: Lightning detected within 8 miles. Teams should clear fields now."></textarea>
             <button type="submit">Generate Update Draft</button>
-            <label for="aiGeneratedOutput">Generated public update</label>
-            <textarea id="aiGeneratedOutput" rows="5" placeholder="Generated update will appear here."></textarea>
+            <label for="aiGeneratedOutput">Public update draft</label>
+            <textarea id="aiGeneratedOutput" rows="5" placeholder="Your public update draft will appear here."></textarea>
             <div class="admin-actions">
               <button id="aiApplyVenueBtn" type="button">Apply to Venue</button>
               <button id="aiApplyGlobalBtn" class="secondary" type="button">Apply as Global Note</button>
@@ -415,13 +415,13 @@
   </aside>
 
   <footer class="footer">
-    <img class="footer-logo" src="assets/smc-logo.png?v=6" alt="Soccer Management Company logo" data-fallback="SMC" />
+    <img class="footer-logo" src="assets/smc-logo.png?v=7" alt="Soccer Management Company logo" data-fallback="SMC" />
     <p>Soccer Management Company - Southeast Weather Hub</p>
   </footer>
 
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
-  <script src="firebase-config.js?v=6"></script>
-  <script src="script.js?v=6"></script>
+  <script src="firebase-config.js?v=7"></script>
+  <script src="script.js?v=7"></script>
 </body>
 </html>

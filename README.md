@@ -42,8 +42,8 @@ Rules used by this build:
 - More than 10 miles through 15 miles creates Yellow monitoring when no Red timer is already active.
 - A new strike at another venue does not alter any other venue timer.
 - Reaching 00:00 does not change the venue to Green.
-- At 00:00 the public display says the timer is complete and SMC All Clear is still required.
-- Manual All Clear is required to remove a lightning-related venue status.
+- At 00:00 the public display says the clearance period is complete and SMC All Clear is still required.
+- Manual All Clear is required to remove a lightning-related venue status and authorize a return to play.
 - Manual All Clear only changes the selected venue.
 
 ## Public traffic model
@@ -149,7 +149,7 @@ Use one reliable internet connection with a backup hotspot available.
 
 Do not use Take Over Command Center unless the primary device is unavailable or staff intentionally transfer control.
 
-When a lightning timer reaches 00:00, verify field and weather conditions, then select Manual All Clear for that venue.
+When a lightning clearance period reaches 00:00, verify field and weather conditions, then select Manual All Clear for that venue.
 
 ## Files
 

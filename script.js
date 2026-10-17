@@ -18,12 +18,12 @@ const admins = [
 ];
 
 const templates = {
-  allClear: "All active venues are operating as scheduled. SMC staff will continue monitoring weather conditions.",
-  monitoring: "SMC staff are monitoring weather conditions. Games remain scheduled unless a venue update states otherwise.",
-  lightningDelay: "Lightning has been detected near one or more venues. Follow the venue-specific instructions below.",
-  heatAdvisory: "SMC staff are monitoring heat conditions. Teams should follow hydration and rest instructions from tournament staff.",
-  fieldClosure: "One or more fields are closed or under review. Check the venue and field status sections for current information.",
-  resumePlay: "SMC staff have issued an all clear for the affected venue. Follow venue-specific restart instructions."
+  allClear: "All active venues are operating as scheduled. SMC staff continue to monitor weather and field conditions.",
+  monitoring: "SMC staff are monitoring weather conditions across active venues. Matches remain on schedule unless a venue-specific update states otherwise.",
+  lightningDelay: "One or more venues are under a lightning delay. Review the venue-specific status and instructions below.",
+  heatAdvisory: "SMC staff are monitoring heat conditions. Teams should follow hydration, recovery, and match management instructions provided by tournament staff.",
+  fieldClosure: "One or more fields are closed or under evaluation. Review the venue and field status sections for current information.",
+  resumePlay: "SMC staff have cleared the affected venue to resume play. Follow venue-specific restart instructions and updated schedules."
 };
 
 const elements = Object.fromEntries([
@@ -124,7 +124,7 @@ function normalizeVenue(id, raw = {}) {
     parking: raw.parking || "",
     status: normalizeStatus(raw.status),
     statusSource: raw.statusSource || "manual",
-    note: raw.note || "Normal operations.",
+    note: raw.note || "All active venues are operating as scheduled.",
     updatedAt: Number(raw.updatedAt || 0),
     fields,
     lightning
@@ -298,9 +298,9 @@ function renderPublicLightning() {
         <div class="public-lightning-header"><h3>Lightning All Clear</h3></div>
         <div class="lightning-public-grid">
           <div class="lightning-stat-box"><span>Active lightning delays</span><strong>NONE</strong></div>
-          <div class="lightning-stat-box countdown-box"><span>Countdown</span><strong class="lightning-countdown-clock">00:00</strong></div>
+          <div class="lightning-stat-box countdown-box"><span>Lightning clearance period</span><strong class="lightning-countdown-clock">00:00</strong></div>
         </div>
-        <p class="lightning-public-note">No active lightning delay is posted. Continue checking the Hub for updates.</p>
+        <p class="lightning-public-note">No active lightning delay is in effect. SMC staff continue to monitor conditions.</p>
       </article>` : "";
     return;
   }
@@ -313,16 +313,16 @@ function renderPublicLightning() {
     const countdown = lightning.active && lightning.clearAt ? formatCountdown(lightning.clearAt) : null;
     let status = venue.status;
     let countdownLabel = "Monitoring";
-    let detail = "SMC staff are monitoring lightning conditions.";
+    let detail = "Lightning is being monitored near this venue. Continue checking the Weather Hub for official updates.";
     if (countdown) {
       countdownLabel = countdown.clock;
       detail = countdown.complete
-        ? "Lightning timer complete. Awaiting manual SMC all clear before play resumes."
-        : "Lightning delay is active. The timer restarts only when a new qualifying strike is entered for this venue.";
+        ? "The lightning clearance timer has reached 00:00. Play remains suspended pending an all clear from SMC staff."
+        : "A lightning delay is in effect. The displayed timer reflects the latest qualifying strike recorded for this venue.";
       status = "red";
     } else if (lightning.awaitingAllClear) {
       countdownLabel = "AWAITING ALL CLEAR";
-      detail = "SMC staff are reviewing conditions before returning the venue to normal operations.";
+      detail = "The lightning clearance period has ended. SMC staff are reviewing current conditions before authorizing a return to play.";
     }
     return `
       <article class="public-lightning-card ${escapeAttr(status)}-lightning-card">
@@ -333,7 +333,7 @@ function renderPublicLightning() {
             <strong>${Number.isFinite(Number(lightning.distance)) ? `${Number(lightning.distance).toFixed(1)} miles` : "Not listed"}</strong>
           </div>
           <div class="lightning-stat-box countdown-box">
-            <span>${countdown && countdown.complete ? "Status" : "Return-to-play timer"}</span>
+            <span>${countdown && countdown.complete ? "Status" : "Lightning clearance period"}</span>
             <strong class="lightning-countdown-clock">${escapeHtml(countdownLabel)}</strong>
           </div>
         </div>
@@ -871,12 +871,12 @@ async function addVenue() {
     parking: elements.newVenueParking.value.trim(),
     status: "green",
     statusSource: "manual",
-    note: "Normal operations.",
+    note: "All active venues are operating as scheduled.",
     updatedAt: firebase.database.ServerValue.TIMESTAMP,
     fields: {}
   };
   const updates = { [`public/venues/${id}`]: venue };
-  historyUpdate(updates, `${name} Green`, "Normal operations.", "green");
+  historyUpdate(updates, `${name} Green`, "All active venues are operating as scheduled.", "green");
   timelineUpdate(updates, "Active venue added", `${name} added to the current weekend Hub.`);
   if (await publishUpdates(updates, `${name} added to the active venue roster.`)) elements.venueForm.reset();
 }
@@ -936,15 +936,15 @@ async function clearWeekendHub() {
 
 function lightningPublicNote(venue, distance, countdown, source) {
   if (countdown && !countdown.complete) {
-    return `Lightning detected ${distance.toFixed(1)} miles from ${venue.name}. Games are suspended. The 30-minute timer is running from the latest qualifying strike. Manual SMC all clear is required before play resumes.`;
+    return `Lightning has been detected ${distance.toFixed(1)} miles from ${venue.name}. Play is suspended. The 30-minute clearance timer is based on the most recent qualifying strike. Play remains suspended until SMC staff issue an all clear.`;
   }
   if (countdown && countdown.complete) {
-    return `The lightning timer for ${venue.name} has reached 00:00. Play remains suspended until SMC staff issue a manual all clear.`;
+    return `The 30-minute lightning clearance period for ${venue.name} has ended. Play remains suspended pending an all clear from SMC staff.`;
   }
   if (distance <= 15) {
-    return `Lightning is being monitored ${distance.toFixed(1)} miles from ${venue.name}. SMC staff are monitoring conditions and will post additional instructions if needed.`;
+    return `Lightning has been detected ${distance.toFixed(1)} miles from ${venue.name}. SMC staff are monitoring conditions closely. Additional instructions will be posted if conditions require a change in operations.`;
   }
-  return `Lightning is currently beyond 15 miles from ${venue.name}. SMC staff continue monitoring conditions. A manual all clear is required to clear a lightning-related venue status.`;
+  return `Lightning is currently more than 15 miles from ${venue.name}. SMC staff continue to monitor conditions. Any existing lightning delay remains in effect until SMC staff issue an all clear.`;
 }
 
 async function applyLightningCheck() {
@@ -1068,11 +1068,11 @@ async function manualAllClear(venueId) {
   const previousLightning = venue.lightning || {};
   const restoreStatus = normalizeStatus(previousLightning.preStatus || "green");
   const restoreSource = previousLightning.preStatusSource || "manual";
-  const restoreNote = previousLightning.preNote || "Normal operations.";
-  const allClearNote = `SMC staff have issued a lightning all clear for ${venue.name}.`;
+  const restoreNote = previousLightning.preNote || "All active venues are operating as scheduled.";
+  const allClearNote = `SMC staff have issued an all clear for ${venue.name}.`;
   const finalNote = restoreStatus === "green"
-    ? `${allClearNote} Normal operations may resume unless tournament staff provide different instructions.`
-    : `${allClearNote} The venue remains ${restoreStatus.toUpperCase()} for a separate condition. ${restoreNote}`;
+    ? `${allClearNote} Play is cleared to resume in accordance with tournament and venue instructions.`
+    : `${allClearNote} The venue remains ${restoreStatus.toUpperCase()} due to a separate condition. ${restoreNote}`;
   const lightning = {
     ...previousLightning,
     active: false,
@@ -1143,12 +1143,12 @@ function generateAiUpdate() {
   const severity = elements.aiSeveritySelect.value;
   const details = elements.aiWeatherDetailsInput.value.trim();
   const action = {
-    Monitoring: "SMC staff are monitoring conditions. Games remain scheduled unless another update is posted.",
-    Delay: "Games are temporarily delayed. Teams should remain clear of the fields and monitor the Hub for updates.",
-    Suspended: "Games are suspended. Teams should leave the fields and follow instructions from SMC staff.",
-    "All Clear": "SMC staff have issued an all clear. Normal operations may resume unless venue staff provide different instructions."
+    Monitoring: `SMC staff are actively monitoring conditions at ${venueName}. Matches remain on schedule unless a venue-specific update is posted.`,
+    "Temporary Delay": `Play is temporarily delayed at ${venueName}. Teams and spectators should remain clear of the fields and continue monitoring the Weather Hub for further instructions.`,
+    "Play Suspended": `Play is suspended at ${venueName}. Teams and spectators should leave the fields and follow directions from SMC staff and venue personnel.`,
+    "All Clear": `SMC staff have issued an all clear for ${venueName}. Play is cleared to resume in accordance with tournament and venue instructions.`
   }[severity];
-  elements.aiGeneratedOutput.value = `${alertType} update for ${venueName}. ${details ? `${details} ` : ""}${action}`.trim();
+  elements.aiGeneratedOutput.value = `${alertType} update. ${details ? `${details} ` : ""}${action}`.trim();
 }
 
 async function applyAiToVenue() {
@@ -1160,7 +1160,7 @@ async function applyAiToVenue() {
   const severity = elements.aiSeveritySelect.value;
   const status = severity === "Monitoring" ? "yellow" : severity === "All Clear" ? "green" : "red";
   if (status !== "red" && venue.lightning && (venue.lightning.active || venue.lightning.monitoring || venue.statusSource === "lightning")) {
-    alert("This venue has a lightning status. Use Manual All Clear instead of an AI-generated All Clear.");
+    alert("This venue has an active lightning status. Use Manual All Clear instead of publishing a Weather Update Builder all clear.");
     return;
   }
   const updates = {
@@ -1170,7 +1170,7 @@ async function applyAiToVenue() {
     [`public/venues/${venue.id}/updatedAt`]: firebase.database.ServerValue.TIMESTAMP
   };
   historyUpdate(updates, `${venue.name} ${titleCaseStatus(status)}`, note, status);
-  timelineUpdate(updates, `${venue.name} generated weather update`, note);
+  timelineUpdate(updates, `${venue.name} weather update published`, note);
   await publishUpdates(updates, `${venue.name} update published.`);
 }
 
